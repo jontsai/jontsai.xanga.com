@@ -1,0 +1,310 @@
+<script type="text/javascript">
+
+var doc_loc_key = "l"+"o"+"c"+"a"+"t"+"i"+"o"+"n";
+var doc_ref_key = "r"+"e"+"f"+"e"+"r"+"r"+"e"+"r";
+//
+// -------------- begin tracker -------------------------
+  var MY_XANGA_NAME = "jontsai"; // insert your xanga name here
+  var doc = document; // xanga doesn't like "document DOT referrer"
+  var xuser = "";
+  var userFound = false;
+
+  // search for it in the innerHTML
+  // <a href="http://www.xanga.com/private/home.aspx?user=YOUR_XANGA_NAME">YOUR_XANGA_NAME</a>
+  var regexp = /\/private\/home.aspx\?user=/;
+  for (var i = 0; i < doc.links.length && !userFound; ++i) {
+    if (doc.links[i].href.match(regexp) != null) {
+      xuser = doc.all ? doc.links[i].innerText : doc.links[i].text ? doc.links[i].text : doc.links[i].innerHTML ? doc.links[i].innerHTML : doc.links[i].outerText ? doc.links[i].outerText : doc.links[i].outerHTML ? doc.links[i].outerHTML : "__BAD_NAME_";
+      userFound = true;
+    }
+  }
+
+  var track = new Image (); // "preload" via Image
+  var ref = encodeURIComponent(doc[doc_ref_key]);
+  var isSelf = ( escape(xuser) == MY_XANGA_NAME );
+
+  if (!isSelf) {
+    var getvars = "u=" + MY_XANGA_NAME + "&xuser=" + xuser + "&r=" + ref;    
+    track.src = "http://www.ocf.berkeley.edu/~jontsai/jtools/jtracker.php?" + getvars;
+  }
+// -------------- end tracker -------------------------
+
+
+// -------------- begin general -------------------------
+
+// set the title
+document.title = "jontsai xanga";
+
+/*
+** addModule
+** inserts an extra module - ie only
+*/
+function addModule(titleContent, moduleContent) {
+    var sub = subTitle.parentNode.parentNode.parentNode.parentNode.parentNode
+    sub.insertAdjacentHTML('beforeBegin','<table border="1" cellspacing="0" cellpadding="4" width="100%" class="left"><tr><th valign="top" align="left" class="left">' + titleContent + '</th></tr><tr><td valign="top" class="left">' + moduleContent)
+    sub.insertAdjacentHTML('beforeBegin','<br>');
+}
+
+
+/*
+** swapDotnet
+** module swapper - xanga.com/add_ons
+** by blogring.net
+** swaps modules to the right
+*/
+function swapDotnet() {
+    var blogring = document.getElementsByTagName("td")
+    for (var i = 0; i < blogring.length; i++) {
+        if (blogring[i] == "mainleft" || blogring[i].width == "200") {
+            var dotnet = blogring[i].cloneNode(true);
+            blogring[i].parentNode.appendChild(dotnet);
+            blogring[i].parentNode.removeChild(blogring[i]);
+            break;
+        }
+    }
+}
+//swapDotnet();
+
+/*
+** colorComments
+** displays reader comments in alternating background colors.
+*/
+function colorComments() {
+    var bgArr = new Array ("transparent", "#444444");
+    var len = bgArr.length;
+    var attname = document.all ? "class"+"Name" : "class";
+    var ctables = document.getElementsByTagName("table");
+    var k=0;
+    for (var i=0; i < ctables.length; ++i) {
+        k = i % len;
+        if (ctables[i].getAttribute(attname) == "blogbody") {
+            ctables[i].style.backgroundColor = bgArr[k];
+        }
+    }
+}
+
+if (doc[doc_loc_key].href.indexOf(".html") != -1) {
+    colorComments();
+}
+
+/*
+** replaceWords
+** replaces all occurences of oldWords with newWords
+*/
+function replaceWords() {
+
+    var oldWords = new Array(
+        " ",
+        "Subscriptions",
+        "Subscribe to jontsai",
+        "read my profile",
+        "sign my guestbook",
+        "comments",
+        "comment",
+        "eprops",
+        "eprop",
+        "email it",
+        "subscribed",
+        "subscribe",
+        "sign out");
+
+    var newWords = new Array(
+        "",
+        "Portfolio",
+        "Buy jontsai stock",
+        "View Full Resume",
+        "File Report",
+        "Memos",
+        "Memo",
+        "Holiday Bonuses",
+        "Holiday Bonus",
+        "Forward Quarter Report",
+        "Shareholder",
+        "Acquire Stock",
+        "Sell Out");
+
+    allTableData = document.getElementsByTagName('td');
+    allTableHeaders = document.getElementsByTagName('th');
+        
+    var collections = new Array(allTableData,allTableHeaders);
+    
+    for (var k = 0 ; k < collections.length ; ++k )
+    {
+        for (var i = 0 ; i < collections[k].length ; ++i )
+        {   
+            if (collections[k][i].innerHTML.indexOf('TABLE') == -1)
+            {
+                for (var n = 0 ; n < oldWords.length; ++n)
+                {
+                    var indx = collections[k][i].innerHTML.indexOf(oldWords[n]) 
+                    while (indx != -1)
+                    {   
+                        var replacement = '';
+                        indx = collections[k][i].innerHTML.indexOf(oldWords[n]);
+                        replacement = collections[k][i].innerHTML.replace(oldWords[n], newWords[n]);
+                        collections[k][i].innerHTML = replacement;
+                        break;                    
+                    }
+                }
+            }
+        }
+    }
+}
+//replaceWords();
+
+// -------------- end general -------------------------
+
+// -------------- begin colorize -------------------------
+var LAST_COLORIZED = "ffffff";
+var DARKEST_COLORIZED = 0;
+var BRIGHTEST_COLORIZED = 15;
+var HEX_DIGITS = "0123456789abcdef";
+var FIRST_COLORIZE_SESSION = true;
+var RAND_COLOR_MAX = 12;
+var RAND_COLOR_OFFSET = 3;
+var RANDOM_FONT_TRANSFORM = false;
+var COLORIZE_SET = new Array();
+var COLORIZE_REF = new Array();
+function colorize(str, startColor, newString) {
+    if (startColor == undefined) {
+        if (FIRST_COLORIZE_SESSION) {
+            LAST_COLORIZED = randomColor();
+            FIRST_COLORIZE_SESSION = false;
+        }
+
+        startColor = LAST_COLORIZED;
+    }
+
+    if (newString == undefined) {
+        newString = "";
+    }
+
+    var len = str.length;
+    if (len == 0) {
+        LAST_COLORIZED = startColor;
+        return newString;
+    } else {
+        newString += '<font color=#' + startColor;
+        newString += '>' + str.charAt(0) + '</font>';
+        // manipulate each hex digit by one
+        var colorArr = hexToDec(startColor);
+
+        for (var i=0; i < colorArr.length; ++i) {
+            if (Math.random() >= 0.5) {
+                colorArr[i] += (colorArr[i] < BRIGHTEST_COLORIZED) ? 1 : -1;
+            } else {
+                colorArr[i] += (colorArr[i] > DARKEST_COLORIZED) ? -1 : 1;
+            }
+        }
+        return colorize(str.substring(1, len), decToHex(colorArr), newString);
+    }
+}
+
+function randN(n) {
+    return Math.round(Math.random() * n);
+}
+
+function randomColor() {
+   var colArr = new Array(6);
+
+   for (var i=0; i < colArr.length; ++i) {
+       // want colors to be half-way bright
+       var randInt = RAND_COLOR_OFFSET + randN(RAND_COLOR_MAX);
+       colArr[i] = randInt;
+   }
+
+   return decToHex(colArr);
+}
+
+function hexToDec(hexStr) {
+    var retArr = new Array(hexStr.length);
+    for (var i=0; i < hexStr.length; ++i) {
+        var replaced = false;
+        for (var j=0; j < 16 && !replaced; ++j) { 
+            if (hexStr.charAt(i) == HEX_DIGITS.charAt(j)) {
+                retArr[i] = j;
+                replaced = true;
+            }
+        }
+    }
+    return retArr;
+}
+
+
+function decToHex(decArr) {
+
+    var retStr = "";
+    for (var i=0; i < decArr.length; ++i) {
+        var value = decArr[i];
+        retStr += HEX_DIGITS.substring(value, value+1);
+    }
+    return retStr;
+}
+
+function colorizeFormat (id, str) {
+    var variations = [
+    "_ "  + colorize(str) + " _",
+    "^ "  + colorize(str) + " ^",
+    "^_ "  + colorize(str) + " _^",
+    "^^^ "  + colorize(str) + " ^^^",
+    "[[[ "  + colorize(str) + " ]]]",
+    "((( "  + colorize(str) + " )))",
+    "[ [ [ "  + colorize(str) + " ] ] ]",
+    "( ( ( "  + colorize(str) + " ) ) )",
+    ];
+
+    var retStr = '<a onclick="javascript:toggleColorize(' + id + ')">';
+    retStr += "click me: " + variations[Math.floor(Math.random() * variations.length)];
+    retStr += '</a>';
+
+    return retStr;
+}
+
+function toggleColorize(id) {
+    var obj = COLORIZE_REF[id];
+    var old = COLORIZE_SET[id];
+    obj.innerHTML = colorizeFormat(id, old);
+}
+
+function colorizeTitles() {
+    // h4 class = itemTitle
+    var header4_objs = document.getElementsByTagName("h4");
+
+    var attname = document.all ? "class"+"Name" : "class";
+
+    for (var i=0; i < header4_objs.length; ++i) {
+        if (header4_objs[i].getAttribute(attname) == "itemtitle") {
+            var id = COLORIZE_SET.length;
+            var old = header4_objs[i].innerHTML;
+            COLORIZE_SET.push(old);
+            COLORIZE_REF.push(header4_objs[i]);
+            header4_objs[i].innerHTML = colorizeFormat(id, old);
+        }
+    }
+}
+
+//colorizeTitles();
+
+// -------------- end colorize -------------------------
+
+// -------------- begin module height overflow -------------------------
+
+// <td valign="top" class="left">
+function moduleHeightOverflow() {
+    var td_objs = document.getElementsByTagName("td");
+    var attname = "class";
+    var attname2 = "valign";
+    for (var i=0; i < td_objs.length; ++i) {
+        if ((td_objs[i].getAttribute(attname) == "left" || td_objs[i].getAttribute(attname) == "left snap_preview") &&
+            td_objs[i].getAttribute(attname2) == "top") {
+            var old = td_objs[i].innerHTML;
+            td_objs[i].innerHTML = '<div class="moduleHeightOverflow" style="max-height: 450px; width: 250px; overflow:auto;">' + old + '</div>';
+        }
+    }
+}
+moduleHeightOverflow();
+// -------------- end module height overflow -------------------------
+</script>
+
+
+jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai jonathan tsai

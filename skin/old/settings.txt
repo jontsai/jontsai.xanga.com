@@ -1,0 +1,53 @@
+Page Width & Alignment
+======================
+Width 100 Percent
+Align: left
+
+Background
+==========
+Color: FFFFFF
+Pic: http://
+Pic: centered, repeat in all directions, scroll with page
+
+Text & Links
+============
+Verdana, 3
+000000
+Normal: 0000FF
+Active: 0000FF
+Visited: 800080
+Hover: 0000FF
+
+Left Module
+===========
+Border: Color CCCC99, Solid 1 Pixel
+Title: Background transp, Text 000000, Align left
+Interior: Background transp, Text 000000, Align left
+
+Music
+=====
+Src: http://
+Loop: no, play it just once
+
+Search Bar and Trim
+===================
+Hide Search Bar
+Trim: CCCC99
+
+Custom Module
+=============
+Title: Online Presence
+Source: custom_module.html
+
+Javascript Module
+=================
+Title: N/A
+Source: N/A
+
+Website Stats
+=============
+Source: website_stats.html
+
+Footer
+======
+Source: footer.html
